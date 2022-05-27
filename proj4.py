@@ -351,6 +351,49 @@ def test_introduction(N, n, k, epsilon):
     plt.legend()
     plt.savefig('intro/Reg, n={}'.format(n))
 
+def test_introduction2(N, n, k, epsilon):
+    # regrets = []
+    payoffs = []
+    probs = []
+    for t in range(N):
+        actions = [2*j / (k-1) for j in range(k)]
+        possible_bids = [j / (k-1) for j in range(k)]
+        V = [[0 for j in range(k)]]
+        regret = [0]
+        payoff = [0]
+
+        for round in range(n):
+            bids = [unif_val(k, possible_bids), squared_cdf(k, possible_bids)]
+            bids.sort(reverse=True)
+            do, prob = simulate_introduction(k, actions, possible_bids, 2, 1, V, payoff, epsilon, bids)
+            # regret.append((V[-1][25] - V[-1][do]) / (round+1))
+
+        # regrets.append(regret)
+        payoffs.append(payoff)
+        probs.append(prob)
+    payoffs_avg = np.mean(payoffs, axis=0)
+    # regrets_avg = np.mean(regrets, axis=0)
+    probs_avg = np.mean(probs, axis=0)
+
+    plt.figure()
+    plt.plot(np.arange(0, 2, step=2/k), probs_avg)
+    plt.xticks(np.arange(0, 2, step=10/k))
+    plt.xlabel("choice")
+    plt.ylabel("probability")
+    plt.title("Selction probability")
+    plt.legend()
+    plt.savefig('intro/prob2, n={}'.format(n))
+
+    # Regret
+    plt.figure()
+    plt.plot(payoffs_avg[1:])
+    plt.xticks(np.arange(1, n, step=n//10))
+    plt.xlabel("round")
+    plt.ylabel("payoff")
+    plt.title("payoffs vs round, n={}".format(n))
+    plt.legend()
+    plt.savefig('intro/payoff2, n={}'.format(n))
+
 
 
 # test_buyers(N=40, n=1000, k=51, n_buyers_total=5, epsilon=1)
@@ -359,6 +402,6 @@ def test_introduction(N, n, k, epsilon):
 
 # test_distribution(N=40, n=1000, k=51, n_buyers=2, epsilon=1)
 
-test_exploit(N=40, n=1000, k=51, n_buyers=2, epsilon=1)
+# test_exploit(N=40, n=1000, k=51, n_buyers=2, epsilon=1)
 
-# test_introduction(N=40, n=1000, k=51, epsilon=1)
+test_introduction2(N=40, n=2000, k=51, epsilon=1)
