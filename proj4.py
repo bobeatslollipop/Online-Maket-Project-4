@@ -107,14 +107,27 @@ def test_convergence(N, n, k, n_buyers, epsilon_list):
     actions = [j / (k-1) for j in range(k)]
     probss = []
     bidss = []
-    for t in range(N):
-        bids = []
-        for round in range(n):
-            bid = [unif_val(k, actions) for b in range(n_buyers)]
-            bid.sort(reverse=True)
-            bids.append(bid)
-        bidss.append(bids)
-    for epsilon in epsilon_list:
+    # for epsilon in epsilon_list:
+    #     regrets = []
+    #     payoffs = []
+    #     probs = []
+    #     for t in range(N):
+    #         V = [[0 for j in range(k)]]
+    #         regret = [0]
+    #         payoff = [0]
+
+    #         for round in range(n):
+    #             do, prob = simulate_auction(k, actions, n_buyers, 1, V, payoff, epsilon, bidss[t][round])
+    #             regret.append((V[-1][25] - payoff[-1]) / (round+1))
+
+    #         regrets.append(regret)
+    #         payoffs.append(payoff)
+    #         probs.append(prob)
+    #     probs_avg = np.mean(probs, axis=0)
+    #     probss.append(probs_avg[25])
+    # probss = np.array(probss)
+
+    for buyer in range(2, n_buyers+1):
         regrets = []
         payoffs = []
         probs = []
@@ -122,9 +135,11 @@ def test_convergence(N, n, k, n_buyers, epsilon_list):
             V = [[0 for j in range(k)]]
             regret = [0]
             payoff = [0]
-
+            
             for round in range(n):
-                do, prob = simulate_auction(k, actions, n_buyers, 1, V, payoff, epsilon, bidss[t][round])
+                bids = [unif_val(k, actions) for b in range(buyer)]
+                bids.sort(reverse=True)
+                do, prob = simulate_auction(k, actions, buyer, 1, V, payoff, 1, bids)
                 regret.append((V[-1][25] - payoff[-1]) / (round+1))
 
             regrets.append(regret)
@@ -137,7 +152,7 @@ def test_convergence(N, n, k, n_buyers, epsilon_list):
     def plot():
         # prob vs epsilon
         plt.figure()
-        plt.plot(epsilon_list, probss)
+        plt.plot([2, 3, 4, 5], probss)
         plt.xlabel("epsilon")
         plt.ylabel("probability of selecting optimal reserve")
         plt.title("probability of optimal reserve vs epsilon")
@@ -238,7 +253,7 @@ def test_buyers(N, n, k, n_buyers_total, epsilon):
                 bids = [unif_val(k, actions) for b in range(n_buyers)]
                 bids.sort(reverse=True)
                 do, prob = simulate_auction(k, actions, n_buyers, 1, V, payoff, epsilon, bids)
-                regret.append((V[-1][25] - V[-1][do]) / (round+1))
+                regret.append((V[-1][25] - payoff[-1]) / (round+1))
 
             regrets.append(regret)
             payoffs.append(payoff)
@@ -290,7 +305,7 @@ def test_distribution(N, n, k, n_buyers, epsilon):
             bids = [squared_cdf(k, actions) for b in range(n_buyers)]
             bids.sort(reverse=True)
             do, prob = simulate_auction(k, actions, n_buyers, 1, V, payoff, epsilon, bids)
-            regret.append((V[-1][25] - V[-1][do]) / (round+1))
+            regret.append((V[-1][25] - payoff[-1]) / (round+1))
 
         regrets.append(regret)
         payoffs.append(payoff)
@@ -398,10 +413,10 @@ def test_introduction2(N, n, k, epsilon):
 
 # test_buyers(N=40, n=1000, k=51, n_buyers_total=5, epsilon=1)
 
-# test_convergence(N=40, n=1000, k=51, n_buyers=2, epsilon_list=np.arange(1, 50, step=1))
+test_convergence(N=40, n=5000, k=51, n_buyers=5, epsilon_list=np.arange(1, 50, step=1))
 
 # test_distribution(N=40, n=1000, k=51, n_buyers=2, epsilon=1)
 
 # test_exploit(N=40, n=1000, k=51, n_buyers=2, epsilon=1)
 
-test_introduction2(N=40, n=2000, k=51, epsilon=1)
+# test_introduction2(N=40, n=2000, k=51, epsilon=1)
